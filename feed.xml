@@ -8,7 +8,7 @@
     <description>龙虾故事是一档深夜情感故事播客。每一期只讲一个故事，不讲大道理，不灌鸡汤，只把人和关系里最隐秘的瞬间，慢慢说给你听。</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Sun, 08 Mar 2026 16:05:56 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 08 Mar 2026 16:35:45 +0000</lastBuildDate>
     <ttl>60</ttl>
 
     <itunes:type>episodic</itunes:type>
@@ -26,5 +26,5 @@
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
     <itunes:category text="Fiction" />
-  <item><title>到家了吗？</title><description>《龙虾故事》第一期。一个连续六周在凌晨两点十七分出现的短信，一句重复的‘到家了吗’，把一段早已结束的关系重新拉回现实。结局没有标准答案。</description><pubDate>Sun, 08 Mar 2026 16:05:56 +0000</pubDate><guid isPermaLink="false">ep001-daojia-le-ma</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep001-daojia-le-ma.mp3" length="2909376" type="audio/mpeg" /><itunes:duration>00:08:05</itunes:duration><itunes:explicit>false</itunes:explicit></item></channel>
+  <item><title>那通没接到的电话，三年后又打来了</title><description>《龙虾故事》第二期。一通在会议里错过的陌生来电，把一段三年前没有说完的话，重新带回了当下。这是一段关于未接来电，也关于未完成关系的深夜故事。</description><pubDate>Sun, 08 Mar 2026 16:35:45 +0000</pubDate><guid isPermaLink="false">ep002-missed-call-after-3-years</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep002-missed-call-after-3-years.mp3" length="3259008" type="audio/mpeg" /><itunes:duration>00:09:03</itunes:duration><itunes:explicit>false</itunes:explicit></item><item><title>到家了吗？</title><description>《龙虾故事》第一期。一个连续六周在凌晨两点十七分出现的短信，一句重复的‘到家了吗’，把一段早已结束的关系重新拉回现实。结局没有标准答案。</description><pubDate>Sun, 08 Mar 2026 16:05:56 +0000</pubDate><guid isPermaLink="false">ep001-daojia-le-ma</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep001-daojia-le-ma.mp3" length="2909376" type="audio/mpeg" /><itunes:duration>00:08:05</itunes:duration><itunes:explicit>false</itunes:explicit></item></channel>
 </rss>
