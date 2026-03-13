@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:ns1="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   <channel>
     <title>龙虾故事</title>
     <link>https://tangkk.github.io/lobster-stories-podcast</link>
-    <atom:link href="https://tangkk.github.io/lobster-stories-podcast/feed.xml" rel="self" type="application/rss+xml" />
+    <ns0:link href="https://tangkk.github.io/lobster-stories-podcast/feed.xml" rel="self" type="application/rss+xml" />
     <language>zh-CN</language>
     <description>龙虾故事是一档深夜情感故事播客。每一期只讲一个故事，不讲大道理，不灌鸡汤，只把人和关系里最隐秘的瞬间，慢慢说给你听。</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
@@ -11,20 +11,24 @@
     <lastBuildDate>Fri, 13 Mar 2026 04:42:57 +0000</lastBuildDate>
     <ttl>60</ttl>
 
-    <itunes:type>episodic</itunes:type>
-    <itunes:author>龙虾故事</itunes:author>
-    <itunes:summary>龙虾故事是一档深夜情感故事播客。每一期只讲一个故事，不讲大道理，不灌鸡汤，只把人和关系里最隐秘的瞬间，慢慢说给你听。</itunes:summary>
-    <itunes:explicit>false</itunes:explicit>
-    <itunes:owner>
-      <itunes:name>龙虾故事</itunes:name>
-      <itunes:email>dengjunqi06323011@gmail.com</itunes:email>
-    </itunes:owner>
-    <itunes:image href="https://tangkk.github.io/lobster-stories-podcast/cover.jpg" />
+    <ns1:type>episodic</ns1:type>
+    <ns1:author>龙虾故事</ns1:author>
+    <ns1:summary>龙虾故事是一档深夜情感故事播客。每一期只讲一个故事，不讲大道理，不灌鸡汤，只把人和关系里最隐秘的瞬间，慢慢说给你听。</ns1:summary>
+    <ns1:explicit>false</ns1:explicit>
+    <ns1:owner>
+      <ns1:name>龙虾故事</ns1:name>
+      <ns1:email>dengjunqi06323011@gmail.com</ns1:email>
+    </ns1:owner>
+    <ns1:image href="https://tangkk.github.io/lobster-stories-podcast/cover.jpg" />
     <image>
       <url>https://tangkk.github.io/lobster-stories-podcast/cover.jpg</url>
       <title>龙虾故事</title>
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
-    <itunes:category text="Fiction" />
-  <item><title>海边旅馆三零七码房</title><description>《龙虾故事》第四期。住进海边旅馆三零七码房的旅人，在一本只写到一半的留言本里，听见了陌生人的告别，也学会了和自己的遗憾和解。</description><pubDate>Fri, 13 Mar 2026 04:42:57 +0000</pubDate><guid isPermaLink="false">ep004-haibian-lvguan-sanlingqi-mafang</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep004-haibian-lvguan-sanlingqi-mafang.mp3" length="3062016" type="audio/mpeg" /><itunes:duration>00:08:30</itunes:duration><itunes:explicit>false</itunes:explicit></item><item><title>凌晨三点的未发送</title><description>《龙虾故事》第三期。一个总在深夜写长消息却从不发送的人，如何在一封封“未发送”里，慢慢与过去和解。</description><pubDate>Fri, 13 Mar 2026 03:54:26 +0000</pubDate><guid isPermaLink="false">ep003-lingchen-san-dian-de-wei-fa-song</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep003-lingchen-san-dian-de-wei-fa-song.mp3" length="2992752" type="audio/mpeg" /><itunes:duration>00:08:19</itunes:duration><itunes:explicit>false</itunes:explicit></item><item><title>那通没接到的电话，三年后又打来了</title><description>《龙虾故事》第二期。一通在会议里错过的陌生来电，把一段三年前没有说完的话，重新带回了当下。这是一段关于未接来电，也关于未完成关系的深夜故事。</description><pubDate>Sun, 08 Mar 2026 16:35:45 +0000</pubDate><guid isPermaLink="false">ep002-missed-call-after-3-years</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep002-missed-call-after-3-years.mp3" length="3259008" type="audio/mpeg" /><itunes:duration>00:09:03</itunes:duration><itunes:explicit>false</itunes:explicit></item><item><title>到家了吗？</title><description>《龙虾故事》第一期。一个连续六周在凌晨两点十七分出现的短信，一句重复的‘到家了吗’，把一段早已结束的关系重新拉回现实。结局没有标准答案。</description><pubDate>Sun, 08 Mar 2026 16:05:56 +0000</pubDate><guid isPermaLink="false">ep001-daojia-le-ma</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep001-daojia-le-ma.mp3" length="2909376" type="audio/mpeg" /><itunes:duration>00:08:05</itunes:duration><itunes:explicit>false</itunes:explicit></item></channel>
+    <ns1:category text="Fiction" />
+  <item><title>海边旅馆三零七码房</title><description>《龙虾故事》第四期。住进海边旅馆三零七码房的旅人，在一本只写到一半的留言本里，听见了陌生人的告别，也学会了和自己的遗憾和解。
+
+文字版阅读：https://tangkk.github.io/lobster-stories/posts/2026-03-13-haibian-lvguan-307/</description><pubDate>Fri, 13 Mar 2026 04:42:57 +0000</pubDate><guid isPermaLink="false">ep004-haibian-lvguan-sanlingqi-mafang</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep004-haibian-lvguan-sanlingqi-mafang.mp3" length="3062016" type="audio/mpeg" /><ns1:duration>00:08:30</ns1:duration><ns1:explicit>false</ns1:explicit></item><item><title>凌晨三点的未发送</title><description>《龙虾故事》第三期。一个总在深夜写长消息却从不发送的人，如何在一封封“未发送”里，慢慢与过去和解。
+
+文字版阅读：https://tangkk.github.io/lobster-stories/posts/2026-03-13-lingchen-san-dian-wei-fa-song/</description><pubDate>Fri, 13 Mar 2026 03:54:26 +0000</pubDate><guid isPermaLink="false">ep003-lingchen-san-dian-de-wei-fa-song</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep003-lingchen-san-dian-de-wei-fa-song.mp3" length="2992752" type="audio/mpeg" /><ns1:duration>00:08:19</ns1:duration><ns1:explicit>false</ns1:explicit></item><item><title>那通没接到的电话，三年后又打来了</title><description>《龙虾故事》第二期。一通在会议里错过的陌生来电，把一段三年前没有说完的话，重新带回了当下。这是一段关于未接来电，也关于未完成关系的深夜故事。</description><pubDate>Sun, 08 Mar 2026 16:35:45 +0000</pubDate><guid isPermaLink="false">ep002-missed-call-after-3-years</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep002-missed-call-after-3-years.mp3" length="3259008" type="audio/mpeg" /><ns1:duration>00:09:03</ns1:duration><ns1:explicit>false</ns1:explicit></item><item><title>到家了吗？</title><description>《龙虾故事》第一期。一个连续六周在凌晨两点十七分出现的短信，一句重复的‘到家了吗’，把一段早已结束的关系重新拉回现实。结局没有标准答案。</description><pubDate>Sun, 08 Mar 2026 16:05:56 +0000</pubDate><guid isPermaLink="false">ep001-daojia-le-ma</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep001-daojia-le-ma.mp3" length="2909376" type="audio/mpeg" /><ns1:duration>00:08:05</ns1:duration><ns1:explicit>false</ns1:explicit></item></channel>
 </rss>
