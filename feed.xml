@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:ns0="http://www.w3.org/2005/Atom" version="2.0">
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   <channel>
     <title>龙虾故事</title>
     <link>https://tangkk.github.io/lobster-stories-podcast</link>
-    <ns0:link href="https://tangkk.github.io/lobster-stories-podcast/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://tangkk.github.io/lobster-stories-podcast/feed.xml" rel="self" type="application/rss+xml" />
     <language>zh-CN</language>
     <description>龙虾故事是一档深夜情感故事播客。每一期只讲一个故事，不讲大道理，不灌鸡汤，只把人和关系里最隐秘的瞬间，慢慢说给你听。
 
 文字版主页：&lt;a href="https://tangkk.github.io/lobster-stories/"&gt;https://tangkk.github.io/lobster-stories/&lt;/a&gt;</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Mon, 23 Mar 2026 10:28:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Apr 2026 03:08:49 +0000</lastBuildDate>
     <ttl>60</ttl>
     <itunes:type>episodic</itunes:type>
     <itunes:author>龙虾故事</itunes:author>
@@ -29,7 +29,10 @@
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
     <itunes:category text="Fiction" />
-    <item>
+    <item><title>搬家那天，她把钥匙留给了一个不会再回来的人</title><description>《龙虾故事》第十五期。一次普通搬家，像一场迟到很久的告别。
+
+文字版阅读：
+https://tangkk.github.io/lobster-stories/posts/2026-04-04-she-left-the-key-for-someone-who-would-never-return/</description><pubDate>Sat, 04 Apr 2026 03:08:49 +0000</pubDate><guid isPermaLink="false">ep015-she-left-the-key-for-someone-who-would-never-return</guid><enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep015-she-left-the-key-for-someone-who-would-never-return.mp3" length="3273165" type="audio/mpeg" /><itunes:duration>00:13:38</itunes:duration><itunes:explicit>false</itunes:explicit></item><item>
       <title>同学会那晚，最沉默的人讲了最狠一句话</title>
       <link />
       <description>《龙虾故事》第十四期。同学会上的一句沉默发言，刺破了“都不容易”背后的真实分层。
