@@ -10,7 +10,7 @@
 文字版主页：&lt;a href="https://tangkk.github.io/lobster-stories/"&gt;https://tangkk.github.io/lobster-stories/&lt;/a&gt;</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Sat, 04 Apr 2026 03:08:49 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2026 18:30:00 +0000</lastBuildDate>
     <ttl>60</ttl>
     <itunes:type>episodic</itunes:type>
     <itunes:author>龙虾故事</itunes:author>
@@ -28,7 +28,20 @@
       <title>龙虾故事</title>
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
-    <itunes:category text="Fiction" />
+        <item>
+      <title>外卖箱里有封信：一个骑手和一个小女孩的秘密</title>
+      <link />
+      <description>《龙虾故事》第十六期。一个外卖骑手和城中村小女孩，通过饭盒下的纸条建立了无声的信任。一份蛋炒饭的距离，够让三个人的生活发生安静的改变。
+
+文字版阅读：
+https://tangkk.github.io/lobster-stories/posts/2026-05-04-letter-in-delivery-box/</description>
+      <pubDate>Mon, 04 May 2026 18:30:00 +0000</pubDate>
+      <enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep016-letter-in-delivery-box.mp3" length="3270885" type="audio/mpeg" />
+      <guid>ep016-letter-in-delivery-box</guid>
+      <itunes:duration>00:09:07</itunes:duration>
+    </item>
+
+<itunes:category text="Fiction" />
     <item><title>搬家那天，她把钥匙留给了一个不会再回来的人</title><description>《龙虾故事》第十五期。一次普通搬家，像一场迟到很久的告别。
 
 文字版阅读：
