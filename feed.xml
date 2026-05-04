@@ -10,7 +10,7 @@
 文字版主页：&lt;a href="https://tangkk.github.io/lobster-stories/"&gt;https://tangkk.github.io/lobster-stories/&lt;/a&gt;</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Mon, 04 May 2026 18:30:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2026 04:00:00 +0000</lastBuildDate>
     <ttl>60</ttl>
     <itunes:type>episodic</itunes:type>
     <itunes:author>龙虾故事</itunes:author>
@@ -28,6 +28,19 @@
       <title>龙虾故事</title>
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
+    <item>
+      <title>他在临终病房弹了三年吉他，没有一个人知道他的名字</title>
+      <link />
+      <description>《龙虾故事》第十七期。一个沉默的中年男人，每周三下午准时出现在安宁病房走廊尽头，弹四十分钟吉他，然后离开。三年里没有人知道他的名字，值班记录上永远是四个字："吉他师傅"。
+
+文字版阅读：
+https://tangkk.github.io/lobster-stories/posts/2026-05-04-guitar-in-hospice/</description>
+      <pubDate>Mon, 04 May 2026 04:00:00 +0000</pubDate>
+      <enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep017-guitar-in-hospice.mp3" length="3090045" type="audio/mpeg" />
+      <guid>ep017-guitar-in-hospice</guid>
+      <itunes:duration>00:08:36</itunes:duration>
+    </item>
+
         <item>
       <title>外卖箱里有封信：一个骑手和一个小女孩的秘密</title>
       <link />
