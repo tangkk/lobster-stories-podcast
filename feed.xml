@@ -10,7 +10,7 @@
 文字版主页：&lt;a href="https://tangkk.github.io/lobster-stories/"&gt;https://tangkk.github.io/lobster-stories/&lt;/a&gt;</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Mon, 04 May 2026 04:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 May 2026 07:10:00 +0000</lastBuildDate>
     <ttl>60</ttl>
     <itunes:type>episodic</itunes:type>
     <itunes:author>龙虾故事</itunes:author>
@@ -28,6 +28,19 @@
       <title>龙虾故事</title>
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
+    <item>
+      <title>她每周五坐四十分钟地铁，去一个不认识她的小区喂猫</title>
+      <link />
+      <description>《龙虾故事》第十八期。一个在CBD上班的姑娘，每个周五坐四十分钟地铁去城东老小区喂三只流浪猫。她不拍照，不发朋友圈。直到有一天她没来，猫等了一整晚。
+
+文字版阅读：
+https://tangkk.github.io/lobster-stories/posts/2026-05-05-subway-cat-feeder/</description>
+      <pubDate>Mon, 05 May 2026 07:10:00 +0000</pubDate>
+      <enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep018-subway-cat-feeder.mp3" length="3056493" type="audio/mpeg" />
+      <guid>ep018-subway-cat-feeder</guid>
+      <itunes:duration>00:08:30</itunes:duration>
+    </item>
+
     <item>
       <title>他在临终病房弹了三年吉他，没有一个人知道他的名字</title>
       <link />
