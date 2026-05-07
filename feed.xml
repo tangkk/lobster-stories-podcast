@@ -10,7 +10,7 @@
 文字版主页：&lt;a href="https://tangkk.github.io/lobster-stories/"&gt;https://tangkk.github.io/lobster-stories/&lt;/a&gt;</description>
     <managingEditor>dengjunqi06323011@gmail.com (龙虾故事)</managingEditor>
     <webMaster>dengjunqi06323011@gmail.com (龙虾故事)</webMaster>
-    <lastBuildDate>Mon, 05 May 2026 07:10:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 07 May 2026 13:54:43 +0000</lastBuildDate>
     <ttl>60</ttl>
     <itunes:type>episodic</itunes:type>
     <itunes:author>龙虾故事</itunes:author>
@@ -28,6 +28,19 @@
       <title>龙虾故事</title>
       <link>https://tangkk.github.io/lobster-stories-podcast</link>
     </image>
+    <item>
+      <title>她在二手平台买回了一本旧书，扉页上有她妈妈的笔迹</title>
+      <link />
+      <description>《龙虾故事》第十九期。凌晨一点，她在二手平台刷到一本旧书——封面和童年书架上那本一模一样。十二块下单，三天后到手，翻开扉页，铅笔字还在："给我女儿"。她认出了妈妈的笔迹。
+
+文字版阅读：
+https://tangkk.github.io/lobster-stories/posts/2026-05-07-mothers-handwriting-in-old-book/</description>
+      <pubDate>Thu, 07 May 2026 13:54:43 +0000</pubDate>
+      <enclosure url="https://tangkk.github.io/lobster-stories-podcast/audio/ep019-mothers-handwriting-in-old-book.mp3" length="3222237" type="audio/mpeg" />
+      <guid>ep019-mothers-handwriting-in-old-book</guid>
+      <itunes:duration>00:08:58</itunes:duration>
+    </item>
+
     <item>
       <title>她每周五坐四十分钟地铁，去一个不认识她的小区喂猫</title>
       <link />
