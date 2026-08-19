@@ -5,7 +5,5 @@
   "speed": 42,
   "volume": 52,
   "pitch": 47,
-  "sample_rate": 24000,
-  "format": "mp3",
-  "note": "龙虾故事默认超拟人配置；禁止回退到macOS say"
+  "note": "龙虾故事默认音色"
 }
