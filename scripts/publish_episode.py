@@ -1,10 +1,37 @@
 #!/usr/bin/env python3
+"""发布新一期播客：上传音频到 Cloudflare R2 并更新 feed.xml。
+
+音频托管已从 GitHub audio/ 迁移到 Cloudflare R2，本脚本负责：
+  1. 把本地音频上传到 R2 的 <prefix>/<slug><ext>
+  2. 往 feed.xml 插入 <item>，enclosure url 指向 R2 公开地址
+  3. 更新 lastBuildDate
+
+R2 配置：
+  凭证（必需，从环境变量读取；本地 ~/.bash_profile 或 GitHub Actions Secrets）：
+    R2_ACCESS_KEY_ID
+    R2_SECRET_ACCESS_KEY
+  可选（脚本内置默认值，可用环境变量覆盖）：
+    R2_ENDPOINT     默认 https://bd7d9dcdf9212eb348713ed05dd78450.r2.cloudflarestorage.com
+    R2_BUCKET       默认 tangkk-podcast
+    R2_PUBLIC_URL   默认 https://pub-e2d65fa7f70240878f2e556592826485.r2.dev
+
+依赖：boto3（pip install boto3）
+
+用法示例：
+  python3 publish_episode.py \
+    --audio /path/to/ep030.mp3 --slug ep030-some-topic \
+    --title '第30期 标题' --description '简介' --duration '00:04:32' \
+    --prefix headlines
+"""
 import argparse
 import datetime as dt
 import os
-import shutil
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
+
+DEFAULT_ENDPOINT = 'https://bd7d9dcdf9212eb348713ed05dd78450.r2.cloudflarestorage.com'
+DEFAULT_BUCKET = 'tangkk-podcast'
+DEFAULT_PUBLIC_URL = 'https://pub-e2d65fa7f70240878f2e556592826485.r2.dev'
 
 
 def ensure_namespaces():
@@ -13,18 +40,31 @@ def ensure_namespaces():
     ET.register_namespace('content', 'http://purl.org/rss/1.0/modules/content/')
 
 
-def add_episode(feed_path, base_url, audio_src, slug, title, description, duration):
+def r2_client(endpoint):
+    import boto3
+    from botocore.config import Config
+    return boto3.client(
+        's3',
+        endpoint_url=endpoint,
+        aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+        aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+        region_name='auto',
+        config=Config(s3={'addressing_style': 'path'}),
+    )
+
+
+def upload_audio(client, bucket, prefix, slug, audio_src):
+    ext = os.path.splitext(audio_src)[1].lower() or '.mp3'
+    key = f"{prefix.rstrip('/')}/{slug}{ext}"
+    size = os.path.getsize(audio_src)
+    client.upload_file(audio_src, bucket, key, ExtraArgs={'ContentType': 'audio/mpeg'})
+    return key, size
+
+
+def add_episode(feed_path, enclosure_url, size, slug, title, description, duration):
     tree = ET.parse(feed_path)
     root = tree.getroot()
     ch = root.find('channel')
-
-    audio_dir = os.path.join(os.path.dirname(feed_path), 'audio')
-    os.makedirs(audio_dir, exist_ok=True)
-    ext = os.path.splitext(audio_src)[1].lower() or '.mp3'
-    audio_name = f"{slug}{ext}"
-    dst = os.path.join(audio_dir, audio_name)
-    shutil.copy2(audio_src, dst)
-    size = os.path.getsize(dst)
 
     item = ET.Element('item')
     ET.SubElement(item, 'title').text = title
@@ -34,7 +74,7 @@ def add_episode(feed_path, base_url, audio_src, slug, title, description, durati
     guid = ET.SubElement(item, 'guid', {'isPermaLink': 'false'})
     guid.text = slug
     ET.SubElement(item, 'enclosure', {
-        'url': f"{base_url}/audio/{audio_name}",
+        'url': enclosure_url,
         'length': str(size),
         'type': 'audio/mpeg'
     })
@@ -57,14 +97,27 @@ def add_episode(feed_path, base_url, audio_src, slug, title, description, durati
 
 if __name__ == '__main__':
     ensure_namespaces()
-    p = argparse.ArgumentParser(description='Append new episode to feed.xml and copy audio')
+    p = argparse.ArgumentParser(description='Upload episode audio to R2 and append to feed.xml')
     p.add_argument('--feed', default='feed.xml')
-    p.add_argument('--base-url', required=True)
     p.add_argument('--audio', required=True)
     p.add_argument('--slug', required=True)
     p.add_argument('--title', required=True)
     p.add_argument('--description', required=True)
     p.add_argument('--duration', default='00:05:00')
+    p.add_argument('--prefix', required=True, help='R2 目录: headlines/heartvoices/bios/stories')
     args = p.parse_args()
-    add_episode(args.feed, args.base_url.rstrip('/'), args.audio, args.slug, args.title, args.description, args.duration)
-    print('OK: episode added')
+
+    required_env = ['R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY']
+    missing = [v for v in required_env if v not in os.environ]
+    if missing:
+        raise SystemExit(f'缺少环境变量: {", ".join(missing)}')
+
+    endpoint = os.environ.get('R2_ENDPOINT', DEFAULT_ENDPOINT).strip('"')
+    bucket = os.environ.get('R2_BUCKET', DEFAULT_BUCKET)
+    public_url = os.environ.get('R2_PUBLIC_URL', DEFAULT_PUBLIC_URL).rstrip('/')
+
+    client = r2_client(endpoint)
+    key, size = upload_audio(client, bucket, args.prefix, args.slug, args.audio)
+    enclosure_url = f"{public_url}/{key}"
+    add_episode(args.feed, enclosure_url, size, args.slug, args.title, args.description, args.duration)
+    print(f'OK: uploaded {key} ({size} bytes), added to {args.feed} -> {enclosure_url}')
