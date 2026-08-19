@@ -6,14 +6,12 @@
   2. 往 feed.xml 插入 <item>，enclosure url 指向 R2 公开地址
   3. 更新 lastBuildDate
 
-R2 配置：
-  凭证（必需，从环境变量读取；本地 ~/.bash_profile 或 GitHub Actions Secrets）：
+R2 配置（全部必需，从环境变量读取；本地 ~/.bash_profile 或 GitHub Actions Secrets）：
     R2_ACCESS_KEY_ID
     R2_SECRET_ACCESS_KEY
-  可选（脚本内置默认值，可用环境变量覆盖）：
-    R2_ENDPOINT     默认 https://bd7d9dcdf9212eb348713ed05dd78450.r2.cloudflarestorage.com
-    R2_BUCKET       默认 tangkk-podcast
-    R2_PUBLIC_URL   默认 https://pub-e2d65fa7f70240878f2e556592826485.r2.dev
+    R2_ENDPOINT     e.g. https://<accountid>.r2.cloudflarestorage.com
+    R2_BUCKET       e.g. tangkk-podcast
+    R2_PUBLIC_URL   e.g. https://pub-xxx.r2.dev
 
 依赖：boto3（pip install boto3）
 
@@ -28,10 +26,6 @@ import datetime as dt
 import os
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
-
-DEFAULT_ENDPOINT = 'https://bd7d9dcdf9212eb348713ed05dd78450.r2.cloudflarestorage.com'
-DEFAULT_BUCKET = 'tangkk-podcast'
-DEFAULT_PUBLIC_URL = 'https://pub-e2d65fa7f70240878f2e556592826485.r2.dev'
 
 
 def ensure_namespaces():
@@ -107,14 +101,14 @@ if __name__ == '__main__':
     p.add_argument('--prefix', required=True, help='R2 目录: headlines/heartvoices/bios/stories')
     args = p.parse_args()
 
-    required_env = ['R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY']
+    required_env = ['R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_PUBLIC_URL']
     missing = [v for v in required_env if v not in os.environ]
     if missing:
         raise SystemExit(f'缺少环境变量: {", ".join(missing)}')
 
-    endpoint = os.environ.get('R2_ENDPOINT', DEFAULT_ENDPOINT).strip('"')
-    bucket = os.environ.get('R2_BUCKET', DEFAULT_BUCKET)
-    public_url = os.environ.get('R2_PUBLIC_URL', DEFAULT_PUBLIC_URL).rstrip('/')
+    endpoint = os.environ['R2_ENDPOINT'].strip('"')
+    bucket = os.environ['R2_BUCKET']
+    public_url = os.environ['R2_PUBLIC_URL'].rstrip('/')
 
     client = r2_client(endpoint)
     key, size = upload_audio(client, bucket, args.prefix, args.slug, args.audio)
