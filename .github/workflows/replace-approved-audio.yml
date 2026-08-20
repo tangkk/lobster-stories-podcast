@@ -1,0 +1,86 @@
+name: Replace Approved Episode Audio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'publish/requests/replace-*.json'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-stories
+  cancel-in-progress: false
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v6
+        with: {fetch-depth: 2}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - name: Install dependencies
+        run: |
+          if ! command -v ffprobe >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          python -m pip install --upgrade pip boto3
+      - name: Resolve replacement request
+        id: req
+        run: |
+          REQUEST=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep -E '^publish/requests/replace-.+\.json$' | head -n 1)
+          test -n "$REQUEST"
+          test "$(jq -r '.operation' "$REQUEST")" = replace_audio
+          for key in run_id artifact_name audio_filename audio_sha256 slug prefix; do
+            value=$(jq -r --arg k "$key" '.[$k] // empty' "$REQUEST"); test -n "$value" || exit 1
+            echo "$key=$value" >> "$GITHUB_OUTPUT"
+          done
+      - name: Validate existing episode
+        env: {SLUG: "${{ steps.req.outputs.slug }}"}
+        run: |
+          for v in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT R2_BUCKET; do test -n "${!v}" || exit 1; done
+          grep -q "<guid[^>]*>${SLUG}</guid>" feed.xml || { echo "Episode does not exist: $SLUG"; exit 1; }
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.req.outputs.artifact_name }}
+          path: approved
+          repository: tangkk/lobster-stories-podcast
+          run-id: ${{ steps.req.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate exact approved audio
+        id: meta
+        env: {FILE: "${{ steps.req.outputs.audio_filename }}", EXPECTED_SHA: "${{ steps.req.outputs.audio_sha256 }}"}
+        run: |
+          AUDIO="approved/$FILE"; test -s "$AUDIO"
+          ACTUAL=$(sha256sum "$AUDIO" | awk '{print $1}'); test "$ACTUAL" = "$EXPECTED_SHA" || { echo 'SHA256 mismatch'; exit 1; }
+          BYTES=$(stat -c %s "$AUDIO"); SECONDS=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$AUDIO")
+          DURATION=$(python -c 'import sys; s=round(float(sys.argv[1])); print(f"{s//3600:02d}:{s%3600//60:02d}:{s%60:02d}")' "$SECONDS")
+          echo "audio=$AUDIO" >> "$GITHUB_OUTPUT"; echo "bytes=$BYTES" >> "$GITHUB_OUTPUT"; echo "duration=$DURATION" >> "$GITHUB_OUTPUT"
+      - name: Replace R2 object and update existing feed item
+        env: {SLUG: "${{ steps.req.outputs.slug }}", PREFIX: "${{ steps.req.outputs.prefix }}", AUDIO: "${{ steps.meta.outputs.audio }}", BYTES: "${{ steps.meta.outputs.bytes }}", DURATION: "${{ steps.meta.outputs.duration }}"}
+        run: |
+          python - <<'PY'
+          import os,boto3,xml.etree.ElementTree as ET
+          from botocore.config import Config
+          c=boto3.client('s3',endpoint_url=os.environ['R2_ENDPOINT'].strip('"'),aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],region_name='auto',config=Config(s3={'addressing_style':'path'}))
+          key=f"{os.environ['PREFIX']}/{os.environ['SLUG']}.mp3"
+          c.upload_file(os.environ['AUDIO'],os.environ['R2_BUCKET'],key,ExtraArgs={'ContentType':'audio/mpeg'})
+          h=c.head_object(Bucket=os.environ['R2_BUCKET'],Key=key); assert h['ContentLength']==int(os.environ['BYTES'])
+          ET.register_namespace('itunes','http://www.itunes.com/dtds/podcast-1.0.dtd'); ET.register_namespace('atom','http://www.w3.org/2005/Atom')
+          t=ET.parse('feed.xml'); ch=t.getroot().find('channel'); item=next(i for i in ch.findall('item') if i.findtext('guid')==os.environ['SLUG'])
+          item.find('enclosure').set('length',os.environ['BYTES']); item.find('{http://www.itunes.com/dtds/podcast-1.0.dtd}duration').text=os.environ['DURATION']
+          t.write('feed.xml',encoding='utf-8',xml_declaration=True)
+          print('replacement verified',key,os.environ['BYTES'],os.environ['DURATION'])
+          PY
+      - name: Commit updated metadata
+        env: {SLUG: "${{ steps.req.outputs.slug }}"}
+        run: |
+          git config user.name github-actions[bot]; git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add feed.xml; git commit -m "Replace audio for ${SLUG} from approved artifact [skip ci]"; git push
