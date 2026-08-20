@@ -12,3 +12,13 @@ RSS and audio hosting for 龙虾故事。
 ## 内容工作流
 
 选题与故事先在对话中讨论、打磨并定稿；**定稿之前不进入 GitHub 发布流程**。定稿后再生成音频并发布 Podcast，同时同步对应文字版。
+
+## TTS Guidelines
+
+- canonical 文字稿首先服务人类阅读，不为 TTS 牺牲可读性；TTS transcript 只从原稿派生。
+- `scripts/prepare_tts_text.py` 只做高确定性的格式与朗读转换；专有名词统一放在 `scripts/pronunciation.json`。
+- 标点就是节奏：短句、自然段和留白优先，少用括号、分号和连续破折号。
+- 本节目朗读应**稍慢、安静、有空间**；情绪来自故事本身，不靠夸张语调制造。
+- 发布前人耳抽检人名、英文、数字和断句。
+
+README 作为长期 editorial / TTS memory，未来 agent 应先遵循这里的规则。
