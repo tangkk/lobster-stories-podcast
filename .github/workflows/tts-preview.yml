@@ -7,12 +7,10 @@ on:
       - 'episodes/**'
       - '.github/workflows/tts-preview.yml'
       - 'scripts/xfyun-tools/**'
-  push:
-    branches: ['build/**']
-    paths:
-      - 'episodes/**'
-      - '.github/workflows/tts-preview.yml'
-      - 'scripts/xfyun-tools/**'
+
+concurrency:
+  group: tts-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
