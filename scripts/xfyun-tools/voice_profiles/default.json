@@ -2,8 +2,8 @@
   "provider": "xfyun-super",
   "ws_url": "wss://cbm01.cn-huabei-1.xf-yun.com/v1/private/mcd9m97e6",
   "voice": "x6_lingfeiyi_pro",
-  "speed": 42,
-  "volume": 48,
-  "pitch": 50,
-  "note": "龙虾故事默认音色"
+  "speed": 46,
+  "volume": 52,
+  "pitch": 48,
+  "note": "龙虾故事默认音色；本期采用龙虾人物 science 的 Lingfeiyi 参数"
 }
