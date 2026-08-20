@@ -34,7 +34,11 @@ Preflight 检查 Editorial / Facts / TTS / Metadata；其中 TTS Preflight 必�
 
 发布必须 idempotent / fail-closed：发布前检查 guid 未存在、episode number 是 feed 推导的下一期、canonical 与批准 artifact 存在、R2 key / 文件名 / 文章音频链接一致、Secrets 完整。重复 guid 或关键输入不一致时直接停止，禁止静默继续或盲目 rerun。
 
-发布后独立 VERIFY：至少核对 R2 对象、Podcast RSS 最新 item、guid、enclosure URL / length、`itunes:duration`、description 真实换行、文字版 URL / RSS / 页面。时长直接从最终音频用 `ffprobe` 计算；shell 中避免 `SECONDS` 等特殊变量名，使用 `AUDIO_SECONDS` 等明确变量。
+**正式发布必须先完成 approved artifact 的本地 metadata validation，再允许任何 R2 上传或 RSS mutation。** 时长、文件非空、enclosure length 等都应从最终 approved MP3 本身计算并验证；任一校验失败时，允许的结果只能是“未发布”，不能留下音频已上传但 feed 未更新、或 feed 已更新但 metadata 错误的半发布状态。
+
+时长直接用 `ffprobe` 从 approved artifact 读取。Shell 实现保持简单和可审计：避免 `SECONDS` 等特殊变量名，也避免在 `$()` command substitution 内嵌 heredoc 这类易受 YAML / shell 拼接影响的结构；优先使用 `AUDIO_SECONDS` 等明确变量与单行 Python / 独立脚本完成格式化。任何发布脚本语法错误都必须发生在有副作用步骤之前。
+
+发布后独立 VERIFY：至少核对 R2 对象、Podcast RSS 最新 item、guid、enclosure URL / length、`itunes:duration`、description 真实换行、文字版 URL / RSS / 页面。
 
 Preview workflow 可以长期保留；Publish 应使用通用、受控的发布入口，不为每一期长期保留 episode-specific workflow。临时一次性 workflow 用完应清理，避免以后误触发。
 
