@@ -10,16 +10,18 @@
 
 ## Canonical / TTS-ready
 
-短句、自然段和留白优先；少用括号、分号、连续破折号。数字、英文、人名在定稿时处理成自然可朗读形式。正文与文字版 canonical 内容逐字一致。本节目不做冗长开场/结束介绍，不靠旁白强行拔高；目标约十分钟，但内容完整性和叙事节奏优先于机械凑时长。
+短句、自然段和留白优先；少用括号、分号、连续破折号。**canonical 从写作阶段就以语音体验为第一排版原则。空行 / 自然段只表示真正需要明显长停顿、情绪落点或叙事转场的位置；不能为了文字视觉效果把本应连续说出的短句拆成多个段落。短停顿交给正常标点和 TTS 自身 prosody。**
+
+数字、金额、百分比、年份、年龄、英文、人名与缩写在 FREEZE 前处理成自然、明确、可正确朗读的形式。避免用奇怪标点、重复标点或视觉断行 hack TTS。正文与文字版 canonical 内容逐字一致，因此文字排版本身也服从 spoken rhythm。本节目不做冗长开场/结束介绍，不靠旁白强行拔高；目标约十分钟，但内容完整性和叙事节奏优先于机械凑时长。
 
 ## Voice & Pause Baseline
 
-使用讯飞；默认 profile：`voice_profiles/default.json`，当前为 `x6_wennuancixingnansheng_mini`、speed 42、volume 52、pitch 47。长文正式主路径为 **自然段分段合成 + 段间约 350ms 静音**。自然段停顿必须显著长于普通句内/句末停顿；过长段落才按句号/问号/感叹号拆分，绝不拆断一句话，经验上约 240–420 字/segment。使用 `xfyun_segmented_run.py`；单段脚本仅用于短样片/排障。
+使用讯飞；默认 profile：`voice_profiles/default.json`，当前为 `x6_wennuancixingnansheng_mini`、speed 42、volume 52、pitch 47。长文正式主路径为 **自然段分段合成 + 段间约 350ms 静音**。自然段停顿必须显著长于普通句内/句末停顿，但 350ms 只用于真实段落 / segment 层级；同一场景或同一情绪动作里的短句不应因视觉留白被强制拉成长停顿。过长段落才按句号/问号/感叹号拆分，绝不拆断一句话，经验上约 240–420 字/segment。使用 `xfyun_segmented_run.py`；单段脚本仅用于短样片/排障。
 
 TTS 前检查讯飞三个环境变量；首次新稿/新环境先跑第一段最小样本。350ms 是经过旧 SOP 实际使用的 baseline，可根据 Audio QA 微调，但不要通过添加奇怪标点修引擎停顿。
 
 ## QA & Publishing Guardrails
 
-Preflight 检查 Editorial / Facts / TTS / Metadata；Audio QA 检查发音、数字、断句、句间停顿、段间停顿、整体语速/节奏。episode number 从 feed 推导，guid、音频文件名、文章音频链接一致；RSS description 使用真实换行。发布后验证 R2、Podcast RSS、文字 RSS 和文章。
+Preflight 检查 Editorial / Facts / TTS / Metadata；其中 TTS Preflight 必须做 spoken-form pass：数字 / 年份 / 英文 / 人名归一化、speech paragraphing、pause intent 检查。Audio QA 检查发音、数字、断句、句间停顿、段间停顿、整体语速/节奏。episode number 从 feed 推导，guid、音频文件名、文章音频链接一致；RSS description 使用真实换行。发布后验证 R2、Podcast RSS、文字 RSS 和文章。
 
 README 是当前 source of truth；旧 OpenClaw SOP 只作历史参考，本机绝对路径、旧 rss-hosting/audio、消息平台交付和逐段进度回报等规则淘汰。
