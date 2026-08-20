@@ -1,0 +1,73 @@
+name: TTS Preview
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'episodes/**'
+      - '.github/workflows/tts-preview.yml'
+      - 'scripts/xfyun-tools/**'
+
+concurrency:
+  group: tts-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      XFYUN_APPID: ${{ secrets.XFYUN_APPID }}
+      XFYUN_API_KEY: ${{ secrets.XFYUN_API_KEY }}
+      XFYUN_API_SECRET: ${{ secrets.XFYUN_API_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependencies
+        shell: bash
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+          python -m pip install --upgrade pip
+          python -m pip install websocket-client
+      - name: Resolve canonical
+        id: inputs
+        shell: bash
+        run: |
+          TEXT_FILE=$(find episodes -maxdepth 1 -type f -name '*.txt' | sort | head -n 1)
+          test -n "$TEXT_FILE" || { echo "No canonical episode text found"; exit 1; }
+          STEM=$(basename "$TEXT_FILE" .txt)
+          echo "text_file=$TEXT_FILE" >> "$GITHUB_OUTPUT"
+          echo "output_name=${STEM}-preview.mp3" >> "$GITHUB_OUTPUT"
+      - name: Validate build-only inputs
+        shell: bash
+        run: |
+          test -n "$XFYUN_APPID" || { echo "Missing XFYUN_APPID"; exit 1; }
+          test -n "$XFYUN_API_KEY" || { echo "Missing XFYUN_API_KEY"; exit 1; }
+          test -n "$XFYUN_API_SECRET" || { echo "Missing XFYUN_API_SECRET"; exit 1; }
+          test -f "${{ steps.inputs.outputs.text_file }}" || { echo "Missing canonical text file"; exit 1; }
+          mkdir -p build
+      - name: Generate segmented TTS preview
+        run: |
+          python scripts/xfyun-tools/xfyun_segmented_run.py \
+            --text-file "${{ steps.inputs.outputs.text_file }}" \
+            --out "build/${{ steps.inputs.outputs.output_name }}" \
+            --profile default \
+            --pause-ms 600
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tts-preview-${{ github.sha }}
+          path: build/${{ steps.inputs.outputs.output_name }}
+          if-no-files-found: error
+          retention-days: 7
