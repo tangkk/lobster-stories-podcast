@@ -43,3 +43,7 @@ Preflight 检查 Editorial / Facts / TTS / Metadata；其中 TTS Preflight 必�
 Preview workflow 可以长期保留；Publish 应使用通用、受控的发布入口，不为每一期长期保留 episode-specific workflow。临时一次性 workflow 用完应清理，避免以后误触发。
 
 README 是当前 source of truth；旧 OpenClaw SOP 只作历史参考，本机绝对路径、旧 rss-hosting/audio、消息平台交付和逐段进度回报等规则淘汰。
+
+## One-pass cross-podcast checklist
+
+每期开工前、正式发布前都必须同时检查 [`ONE_PASS_PRODUCTION.md`](ONE_PASS_PRODUCTION.md)。其中记录四档实跑后统一的 Preview 去重、voice/profile、approved artifact、新一期/重制分流、Hugo future-date、Pages VERIFY 与 replacement rollback 规则；与本 README 冲突时采用更严格的 fail-closed 规则。
