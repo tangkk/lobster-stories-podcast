@@ -6,7 +6,9 @@
 
 ## Workflow
 
-**IDEA → WRITE → FREEZE → PREFLIGHT → BUILD → LISTEN → PUBLISH → VERIFY**。选题和故事先在对话中打磨；用户确认的定稿就是 TTS-ready canonical 稿，同时用于文字版与 Podcast。定稿前不进入 GitHub 发布流程；正式发布前再次确认。
+**IDEA → WRITE → FREEZE → PREFLIGHT → Draft PR → TTS PREVIEW → ARTIFACT → LISTEN → AUDIO QA → APPROVE ARTIFACT → MERGE → PUBLISH APPROVED ARTIFACT → VERIFY**。
+
+选题和故事先在对话中打磨；用户确认的定稿就是 TTS-ready canonical 稿，同时用于文字版与 Podcast。每期使用独立 build/episode branch 与 Draft PR 作为 staging boundary：Draft PR 可反复改稿和生成试听，但 build-only preview 不得上传 R2、修改 RSS 或发布。只有 Audio QA 通过并明确批准该 artifact 后才 merge；正式发布仍是独立、明确的有副作用 gate。
 
 ## Canonical / TTS-ready
 
@@ -20,8 +22,20 @@
 
 TTS 前检查讯飞三个环境变量；首次新稿/新环境先跑第一段最小样本。350ms 是经过旧 SOP 实际使用的 baseline，可根据 Audio QA 微调，但不要通过添加奇怪标点修引擎停顿。
 
+## GitHub Build / Artifact Standard
+
+GitHub Actions 是纯 GitHub 路线的执行环境。Preview workflow 长期存在，优先由 Draft PR 自动触发；固定 Python 3.12，并先 `command -v ffmpeg` 检测 runner，存在则复用，不存在才安装，再用 `ffmpeg -version` 验证。Secrets 在真正工作前显式检查，关键步骤失败必须 fail closed，不用 `continue-on-error` 吞错。
+
+Audio QA 批准的是一个具体的 preview artifact，而不是抽象的“这版文字”。**正式发布应优先复用已经试听批准的同一音频 artifact，不应无必要重新 TTS**；对故事类长音频尤其重要。若技术上暂时必须重新生成，则重新生成的成片必须视为新的待验证 artifact。
+
 ## QA & Publishing Guardrails
 
-Preflight 检查 Editorial / Facts / TTS / Metadata；其中 TTS Preflight 必须做 spoken-form pass：数字 / 年份 / 英文 / 人名归一化、speech paragraphing、pause intent 检查。Audio QA 检查发音、数字、断句、句间停顿、段间停顿、整体语速/节奏。episode number 从 feed 推导，guid、音频文件名、文章音频链接一致；RSS description 使用真实换行。发布后验证 R2、Podcast RSS、文字 RSS 和文章。
+Preflight 检查 Editorial / Facts / TTS / Metadata；其中 TTS Preflight 必须做 spoken-form pass：数字 / 年份 / 英文 / 人名归一化、speech paragraphing、pause intent 检查。Audio QA 检查发音、数字、断句、句间停顿、段间停顿、整体语速/节奏。
+
+发布必须 idempotent / fail-closed：发布前检查 guid 未存在、episode number 是 feed 推导的下一期、canonical 与批准 artifact 存在、R2 key / 文件名 / 文章音频链接一致、Secrets 完整。重复 guid 或关键输入不一致时直接停止，禁止静默继续或盲目 rerun。
+
+发布后独立 VERIFY：至少核对 R2 对象、Podcast RSS 最新 item、guid、enclosure URL / length、`itunes:duration`、description 真实换行、文字版 URL / RSS / 页面。时长直接从最终音频用 `ffprobe` 计算；shell 中避免 `SECONDS` 等特殊变量名，使用 `AUDIO_SECONDS` 等明确变量。
+
+Preview workflow 可以长期保留；Publish 应使用通用、受控的发布入口，不为每一期长期保留 episode-specific workflow。临时一次性 workflow 用完应清理，避免以后误触发。
 
 README 是当前 source of truth；旧 OpenClaw SOP 只作历史参考，本机绝对路径、旧 rss-hosting/audio、消息平台交付和逐段进度回报等规则淘汰。
