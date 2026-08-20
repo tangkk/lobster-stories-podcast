@@ -5,5 +5,6 @@
   "audio_filename": "late-night-message-preview.mp3",
   "audio_sha256": "a4643ae3ca9bab6a09cd5a5760dd8bc4a4e8a9418c3c94810bfbcb44ea1cd2cc",
   "slug": "ep022-late-night-message",
-  "prefix": "stories"
+  "prefix": "stories",
+  "approved": true
 }
