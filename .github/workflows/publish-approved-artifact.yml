@@ -37,8 +37,9 @@ jobs:
       - name: Resolve publish request
         id: req
         run: |
-          REQUEST=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep -E '^publish/requests/(?!replace-).+\.json$' -P | head -n 1)
+          REQUEST=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep '^publish/requests/.*\.json$' | grep -v '^publish/requests/replace-' | head -n 1)
           test -n "$REQUEST" || { echo 'No new-episode publish request'; exit 1; }
+          python -m json.tool "$REQUEST" >/dev/null
           for key in run_id artifact_name audio_filename audio_sha256 slug title description article_url prefix; do
             value=$(jq -r --arg k "$key" '.[$k] // empty' "$REQUEST"); test -n "$value" || exit 1
             echo "$key<<EOF" >> "$GITHUB_OUTPUT"; echo "$value" >> "$GITHUB_OUTPUT"; echo EOF >> "$GITHUB_OUTPUT"
@@ -63,6 +64,7 @@ jobs:
         run: |
           AUDIO="approved/$FILE"; test -s "$AUDIO"; test "$(sha256sum "$AUDIO"|awk '{print $1}')" = "$EXPECTED_SHA"
           B=$(stat -c %s "$AUDIO"); S=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$AUDIO")
+          python -c 'import sys; assert float(sys.argv[1])>1' "$S"
           D=$(python -c 'import sys; s=round(float(sys.argv[1])); print(f"{s//3600:02d}:{s%3600//60:02d}:{s%60:02d}")' "$S")
           echo "audio=$AUDIO" >> "$GITHUB_OUTPUT"; echo "bytes=$B" >> "$GITHUB_OUTPUT"; echo "duration=$D" >> "$GITHUB_OUTPUT"
       - name: Upload approved audio and update feed
