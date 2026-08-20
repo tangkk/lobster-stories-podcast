@@ -1,0 +1,151 @@
+name: Publish Approved Artifact
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'publish/requests/**.json'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-stories
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies
+        shell: bash
+        run: |
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffprobe -version | head -n 1
+          python -m pip install --upgrade pip
+          python -m pip install boto3
+
+      - name: Resolve publish request
+        id: req
+        shell: bash
+        run: |
+          REQUEST=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep -E '^publish/requests/.+\.json$' | head -n 1)
+          test -n "$REQUEST" || { echo 'No publish request in triggering commit'; exit 1; }
+          python -m json.tool "$REQUEST" >/dev/null
+          echo "request=$REQUEST" >> "$GITHUB_OUTPUT"
+          for key in run_id artifact_name audio_filename audio_sha256 slug title description article_url prefix; do
+            value=$(jq -r --arg k "$key" '.[$k] // empty' "$REQUEST")
+            test -n "$value" || { echo "Missing request field: $key"; exit 1; }
+            echo "$key<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$value" >> "$GITHUB_OUTPUT"
+            echo 'EOF' >> "$GITHUB_OUTPUT"
+          done
+
+      - name: Validate pre-publish state
+        shell: bash
+        env:
+          SLUG: ${{ steps.req.outputs.slug }}
+        run: |
+          for v in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT R2_BUCKET R2_PUBLIC_URL; do
+            test -n "${!v}" || { echo "Missing $v"; exit 1; }
+          done
+          ! grep -q "<guid[^>]*>${SLUG}</guid>" feed.xml || { echo "GUID already exists: $SLUG"; exit 1; }
+          NEXT=$(python -c 'import re, pathlib; s=pathlib.Path("feed.xml").read_text(); nums=[int(x) for x in re.findall(r"<guid[^>]*>ep(\d+)-",s)]; print(max(nums)+1 if nums else 1)')
+          REQ=$(python -c 'import re,sys; m=re.match(r"ep(\d+)-",sys.argv[1]); print(int(m.group(1)) if m else -1)' "$SLUG")
+          test "$REQ" = "$NEXT" || { echo "Episode number mismatch: expected $NEXT, got $REQ"; exit 1; }
+
+      - name: Download approved artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.req.outputs.artifact_name }}
+          path: approved
+          repository: tangkk/lobster-stories-podcast
+          run-id: ${{ steps.req.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate approved audio metadata
+        id: meta
+        shell: bash
+        env:
+          FILE: ${{ steps.req.outputs.audio_filename }}
+          EXPECTED_SHA: ${{ steps.req.outputs.audio_sha256 }}
+        run: |
+          AUDIO="approved/$FILE"
+          test -s "$AUDIO" || { echo 'Approved audio missing or empty'; exit 1; }
+          ACTUAL_SHA=$(sha256sum "$AUDIO" | awk '{print $1}')
+          test "$ACTUAL_SHA" = "$EXPECTED_SHA" || { echo "Audio SHA256 mismatch"; exit 1; }
+          AUDIO_BYTES=$(stat -c %s "$AUDIO")
+          AUDIO_SECONDS=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$AUDIO")
+          python -c 'import sys; s=float(sys.argv[1]); assert s > 1; print(f"validated duration: {s:.3f}s")' "$AUDIO_SECONDS"
+          DURATION=$(python -c 'import sys; s=round(float(sys.argv[1])); print(f"{s//3600:02d}:{(s%3600)//60:02d}:{s%60:02d}")' "$AUDIO_SECONDS")
+          test "$DURATION" != '00:00:00' || { echo 'Invalid zero duration'; exit 1; }
+          echo "audio=$AUDIO" >> "$GITHUB_OUTPUT"
+          echo "bytes=$AUDIO_BYTES" >> "$GITHUB_OUTPUT"
+          echo "duration=$DURATION" >> "$GITHUB_OUTPUT"
+
+      - name: Upload approved audio and update feed
+        shell: bash
+        env:
+          SLUG: ${{ steps.req.outputs.slug }}
+          TITLE: ${{ steps.req.outputs.title }}
+          DESCRIPTION: ${{ steps.req.outputs.description }}
+          PREFIX: ${{ steps.req.outputs.prefix }}
+          AUDIO: ${{ steps.meta.outputs.audio }}
+          DURATION: ${{ steps.meta.outputs.duration }}
+        run: |
+          python scripts/publish_episode.py \
+            --audio "$AUDIO" \
+            --slug "$SLUG" \
+            --title "$TITLE" \
+            --description "$DESCRIPTION" \
+            --duration "$DURATION" \
+            --prefix "$PREFIX"
+
+      - name: Verify R2 and feed before commit
+        shell: bash
+        env:
+          SLUG: ${{ steps.req.outputs.slug }}
+          PREFIX: ${{ steps.req.outputs.prefix }}
+          EXPECTED_BYTES: ${{ steps.meta.outputs.bytes }}
+          EXPECTED_DURATION: ${{ steps.meta.outputs.duration }}
+        run: |
+          python -c 'import os,boto3; from botocore.config import Config; c=boto3.client("s3",endpoint_url=os.environ["R2_ENDPOINT"].strip("\""),aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],region_name="auto",config=Config(s3={"addressing_style":"path"})); key=f"{os.environ["PREFIX"]}/{os.environ["SLUG"]}.mp3"; h=c.head_object(Bucket=os.environ["R2_BUCKET"],Key=key); assert h["ContentLength"]==int(os.environ["EXPECTED_BYTES"]); print("R2 verified",key,h["ContentLength"])'
+          python -c 'import os,xml.etree.ElementTree as ET; r=ET.parse("feed.xml").getroot(); ch=r.find("channel"); item=ch.find("item"); ns={"itunes":"http://www.itunes.com/dtds/podcast-1.0.dtd"}; g=item.findtext("guid"); d=item.findtext("itunes:duration",namespaces=ns); e=item.find("enclosure"); assert g==os.environ["SLUG"]; assert d==os.environ["EXPECTED_DURATION"] and d!="00:00:00"; assert int(e.attrib["length"])==int(os.environ["EXPECTED_BYTES"]); print("feed verified",g,d,e.attrib["length"])'
+
+      - name: Commit feed
+        shell: bash
+        env:
+          SLUG: ${{ steps.req.outputs.slug }}
+          PREFIX: ${{ steps.req.outputs.prefix }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- feed.xml
+          git commit -m "Publish ${SLUG} from approved artifact [skip ci]"
+          if ! git push; then
+            echo 'git push failed; rolling back newly uploaded R2 object'
+            python -c 'import os,boto3; from botocore.config import Config; c=boto3.client("s3",endpoint_url=os.environ["R2_ENDPOINT"].strip("\""),aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],region_name="auto",config=Config(s3={"addressing_style":"path"})); c.delete_object(Bucket=os.environ["R2_BUCKET"],Key=f"{os.environ["PREFIX"]}/{os.environ["SLUG"]}.mp3")'
+            exit 1
+          fi
