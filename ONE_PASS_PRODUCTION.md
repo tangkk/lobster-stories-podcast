@@ -13,24 +13,27 @@
 
 ## 3. Draft PR 是唯一 staging boundary
 - Preview 只由 PR 更新触发。
-- Preview 阶段只生成 TTS artifact，不写 Podcast 的 R2/RSS。
+- Preview 阶段只生成 TTS artifact，不写正式 Podcast 的 R2/RSS。
 - Audio QA 批准具体 artifact；记录 run_id、artifact_name、audio_filename、SHA256。
 
 ## 4. 固定交付节奏：Preview 试听时发布文字版
 标准流程固定为：
 
-`开始制作 → canonical 定稿 → TTS Preview → 用户收到 Preview 完成通知 → 用户要求“发来听一下” → 发送试听 MP3 + 同步发布文字版 → 用户试听确认 → 发布 Podcast`
+`开始制作 → canonical 定稿 → TTS Preview → 用户收到 Preview 完成通知 → 用户要求“发来听一下” → 发送试听 MP3 + 发布带 Preview 音频播放器的文字版 → 用户试听确认 → 发布 Podcast`
 
 - **用户说“发来听一下”时，必须在发送 Preview MP3 的同时发布该期文字版。**
+- **文字版必须嵌入当前这次 TTS Preview 的音频播放器，并提供可直接访问的备用音频链接。**
+- Preview 音频必须使用独立 preview R2 路径；不得写入正式 Podcast RSS，不得冒充正式 enclosure。
 - 文字版正文逐字使用当前 Preview 对应 canonical，禁止摘要、改写、删节。
-- 此阶段只发布文字站；**不得发布 Podcast，不得写正式 Podcast RSS/R2 音频。**
-- 文字站发布后完成 Pages VERIFY。
+- 此阶段只发布文字站与 preview 音频；**不得发布正式 Podcast，不得写正式 Podcast RSS。**
+- 文字站发布后完成 Pages VERIFY，并验证线上文章实际包含播放器和当前 preview audio URL。
 - 用户明确说“发布”或等价确认后，才进入正式 Podcast 发布。
 
 ## 5. “发布”默认指最终 Podcast 发布
 - 用户说“发布”，默认批准当前试听 artifact 并发布正式 Podcast。
 - 正式 Podcast 必须复用用户刚试听并批准的 artifact，不重新 TTS。
-- 若 Preview 后 canonical 有任何修改，必须重新 Preview，并同步更新文字版后再请求最终批准。
+- 正式 Podcast 发布后，将文字页播放器/音频链接安全切换到最终 approved R2 音频 URL；正文不得改变。
+- 若 Preview 后 canonical 有任何修改，必须重新 Preview，并同步更新文字版和 Preview 音频后再请求最终批准。
 
 ## 6. 发布只复用 approved artifact
 - 新一期走常驻 `Publish Approved Artifact` + request JSON。
@@ -43,15 +46,16 @@
 
 ## 8. 文字版发布与 VERIFY
 - **文字版正文必须逐字使用当前 Preview 对应的 canonical 口播稿原文。**
-- Preview 阶段文字版不依赖正式 Podcast enclosure；不得为了等待正式音频而延迟文字发布。
+- **Preview 阶段文字版必须带当前 Preview 音频播放器与备用链接。** 缺播放器、URL 不匹配、音频不可访问都视为文字版发布失败。
+- Preview 阶段文字版不依赖正式 Podcast enclosure；Preview 音频走独立 preview R2 object，不得为了等待正式音频而延迟文字发布。
 - 正式 Podcast 发布后，可安全更新播放器/音频链接指向最终 approved R2 object；正文不得改变。
-- `draft: false`；Hugo date 不得晚于实际 build 时间。
-- VERIFY：source entry → Pages deployment success → article URL → 首页/列表 entry。
+- `draft: false`；Hugo 构建使用 `--buildFuture`，避免时区导致文章静默过滤。
+- VERIFY：source entry → preview audio URL reachable → generated page contains audio player → Pages deployment success → article URL → 首页/列表 entry。
 
 ## 9. 最终 VERIFY
-Preview/文字阶段：`canonical ✓ → preview artifact ✓ → Preview MP3 发给用户 ✓ → text = canonical verbatim ✓ → Pages ✓`
+Preview/文字阶段：`canonical ✓ → preview artifact ✓ → Preview MP3 发给用户 ✓ → preview R2 ✓ → text = canonical verbatim ✓ → player uses current preview audio ✓ → Pages ✓ → online article/list ✓`
 
-Podcast 阶段：`user approval ✓ → approved SHA ✓ → R2 ✓ → RSS ✓ → duration/length ✓ → text still matches canonical ✓`
+Podcast 阶段：`user approval ✓ → approved SHA ✓ → final R2 ✓ → RSS ✓ → duration/length ✓ → text still matches canonical ✓ → text player switched to final audio ✓`
 
 ## 10. 操作纪律
 - 每个有副作用步骤只走一条明确路径，不并行写同一资源。
